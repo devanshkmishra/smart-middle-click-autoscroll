@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Smart Middle Click Autoscroll Help</title>
+<style>
+:root { color-scheme: light dark; font: 16px/1.6 system-ui; background: Canvas; color: CanvasText; }
+body { max-width: 640px; margin: 56px auto; padding: 0 24px; }
+h1 { font-size: 28px; line-height: 1.2; } h2 { font-size: 20px; margin-top: 32px; }
+a { color: LinkText; } li { margin-block: 8px; } kbd { font: inherit; font-weight: 600; }
+</style>
+<main>
+<h1>Smart Middle Click Autoscroll</h1>
+<p>Middle-click scrollable content, then move the pointer to control speed. Move back to the anchor to pause. Click again or press <kbd>Esc</kbd> to stop.</p>
+<p>Links, tabs, and controls keep their normal middle-click actions. Holding a keyboard modifier also preserves the native click.</p>
+<h2>Set up</h2>
+<p>Enable the app in System Settings → Privacy &amp; Security → Accessibility. This lets it identify controls and generate scrolling across apps. It processes input locally without saving page text or keystrokes.</p>
+<h2>Menu bar controls</h2>
+<ul>
+<li>Enable or pause autoscroll.</li>
+<li>Adjust scrolling speed and horizontal scrolling.</li>
+<li>Keep native middle click in apps that need their own middle-button gestures.</li>
+</ul>
+<p>Closing Settings leaves the app running in the menu bar. Use Quit to stop it.</p>
+<h2>If scrolling does not start</h2>
+<p>Some apps do not expose enough Accessibility information. Smart Middle Click Autoscroll preserves the native click when it cannot identify a suitable target.</p>
+<p>Check Diagnostics in the menu bar for the last routing decision, or retry the input listener. After replacing or rebuilding the app, macOS may require removing and re-adding its Accessibility entry.</p>
+<p>If you use a mouse remapper, it must deliver a middle click to the app. Avoid running multiple autoscroll utilities at once.</p>
+<p><a href="TestPage.html">Open the local test page</a> · <a href="https://github.com/devanshkmishra/smart-middle-click-autoscroll">Source and support</a></p>
+</main>
+</html>

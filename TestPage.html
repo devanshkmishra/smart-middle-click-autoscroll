@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Smart Middle Click Autoscroll — local test page</title>
+<style>
+:root{color-scheme:light dark;font:17px/1.6 system-ui;background:Canvas;color:CanvasText}
+body{max-width:850px;margin:48px auto;padding:0 28px} h1,h2{line-height:1.2}section{margin:40px 0}
+a{color:LinkText} input,button{font:inherit;padding:12px}button{cursor:pointer}
+.panel{height:260px;overflow:auto;border:2px solid GrayText;padding:16px}.wide{width:1400px}
+.plain{padding:18px 0;border-bottom:1px solid GrayText}output{display:block;margin:12px 0}
+</style>
+<h1>Smart Middle Click Autoscroll test page</h1>
+<p>This local page makes no network requests. It is for testing mouse behavior after granting Accessibility to Smart Middle Click Autoscroll.</p>
+<output id="events" aria-live="polite">Last pointer event: none</output>
+<section><h2>Native clicks</h2>
+<p>Middle-click <a href="TestPage.html?new-tab=1" target="_blank">this example link, including its nested <strong>bold text</strong></a>. A new tab should open. Middle-click the new tab to close it.</p>
+<p><label>Editable field: <input placeholder="Middle click should remain native"></label></p>
+<button id="custom">Custom middle-click control</button><output id="count" aria-live="polite">Native middle clicks received: 0</output>
+</section>
+<section><h2>Nested scroll panel</h2><p>Start autoscroll over plain text inside this panel. Only this panel should move.</p>
+<div class="panel" tabindex="0" role="region" aria-label="Nested scroll test"><div class="wide" id="nested"></div></div></section>
+<section><h2>Long page</h2><p>Start autoscroll over the ordinary text below. Move away from the anchor to scroll, return to it to pause, and press Esc to stop.</p><div id="long"></div></section>
+<script>
+let received=0;
+for (const name of ['mousedown','mouseup','auxclick']) document.addEventListener(name,event=>{
+  document.querySelector('#events').textContent=`Last pointer event: ${name}, button ${event.button}, target ${event.target.tagName.toLowerCase()}${event.target.id ? '#'+event.target.id : ''}`;
+},true);
+document.querySelector('#custom').addEventListener('auxclick',event=>{if(event.button===1){event.preventDefault();document.querySelector('#count').textContent=`Native middle clicks received: ${++received}`;}});
+for(let n=1;n<=18;n++){const p=document.createElement('p');p.textContent=`Nested panel line ${n}. This is ordinary scrollable text. Move horizontally to test the wide panel.`;document.querySelector('#nested').append(p);}
+for(let n=1;n<=65;n++){const p=document.createElement('p');p.className='plain';p.textContent=`Paragraph ${n}. Ordinary document content for checking vertical autoscroll, speed, the dead zone, and stopping behavior.`;document.querySelector('#long').append(p);}
+</script></html>

@@ -1,0 +1,22 @@
+name: Bug report
+description: Report an autoscroll or native middle-click issue.
+body:
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: App version, macOS version, affected app, mouse, and mouse remapper.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps and result
+      description: What did you click, what did you expect, and what happened?
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Diagnostics
+      description: Copy the last click decision and counters from the menu's Diagnostics window. Do not include private page text or keystrokes.

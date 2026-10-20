@@ -1,0 +1,29 @@
+name: Build and test
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Test
+        run: ./scripts/test.sh
+      - name: Build universal app and package
+        run: ./scripts/package.sh
+      - name: Verify bundle and architectures
+        run: |
+          codesign --verify --strict 'dist/Smart Middle Click Autoscroll.app'
+          xcrun lipo -verify_arch arm64 x86_64 'dist/Smart Middle Click Autoscroll.app/Contents/MacOS/SmartMiddleClickAutoscroll'
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: Smart-Middle-Click-Autoscroll
+          path: |
+            dist/*.zip
+            dist/SHA256SUMS.txt
+          if-no-files-found: error
