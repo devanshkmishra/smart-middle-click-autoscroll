@@ -1,3 +1,5 @@
+<img src="Resources/AppIcon.png" width="96" height="96" alt="Smart Middle Click Autoscroll icon">
+
 # Smart Middle Click Autoscroll
 
 Windows-style middle-button autoscroll for macOS, with native middle clicks preserved on links, tabs, and controls.

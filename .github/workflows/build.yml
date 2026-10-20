@@ -20,6 +20,8 @@ jobs:
         run: |
           codesign --verify --strict 'dist/Smart Middle Click Autoscroll.app'
           xcrun lipo 'dist/Smart Middle Click Autoscroll.app/Contents/MacOS/SmartMiddleClickAutoscroll' -verify_arch arm64 x86_64
+          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIconFile' 'dist/Smart Middle Click Autoscroll.app/Contents/Info.plist')" = AppIcon.icns
+          test -s 'dist/Smart Middle Click Autoscroll.app/Contents/Resources/AppIcon.icns'
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: Smart-Middle-Click-Autoscroll

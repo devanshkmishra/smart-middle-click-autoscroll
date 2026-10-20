@@ -18,6 +18,7 @@ xcrun lipo -create "$build_dir/$executable-arm64" "$build_dir/$executable-x86_64
 install -m 755 "$build_dir/$executable" "$bundle/Contents/MacOS/$executable.new"
 mv -f "$bundle/Contents/MacOS/$executable.new" "$bundle/Contents/MacOS/$executable"
 cp "$project_dir/Resources/Help.html" "$project_dir/TestPage.html" "$project_dir/LICENSE" "$bundle/Contents/Resources/"
+cp "$project_dir/Resources/AppIcon.icns" "$bundle/Contents/Resources/"
 cat > "$bundle/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -26,6 +27,7 @@ cat > "$bundle/Contents/Info.plist" <<PLIST
 <key>CFBundleIdentifier</key><string>io.github.devanshkmishra.smartmiddleclickautoscroll</string>
 <key>CFBundleName</key><string>$app_name</string>
 <key>CFBundleDisplayName</key><string>$app_name</string>
+<key>CFBundleIconFile</key><string>AppIcon.icns</string>
 <key>CFBundlePackageType</key><string>APPL</string>
 <key>CFBundleShortVersionString</key><string>$version</string>
 <key>CFBundleVersion</key><string>$version</string>

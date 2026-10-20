@@ -19,6 +19,8 @@ Keep logs free of page text, field contents, and keystrokes. A useful bug report
 
 ## Publish a release
 
+The app icon is generated from vector drawing code in `scripts/generate-icon.swift`. Run `./scripts/generate-icon.sh` after changing the artwork; commit both generated files in `Resources/`. Normal app builds use the committed icon and do not require regenerating it.
+
 1. Update `VERSION` and `CHANGELOG.md`.
 2. Run the automated and manual checks.
 3. Run `./scripts/package.sh` and verify the bundle with `codesign --verify --strict`.
