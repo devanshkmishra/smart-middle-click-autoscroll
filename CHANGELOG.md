@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.2
+
+- Adds an independent Show in Menu Bar setting alongside Show in Dock.
+- Reopening the app from Spotlight or Finder always opens Settings, even with both icons hidden, without changing either preference.
+- Manual launches open Settings; login-item launches stay in the background when Accessibility is available.
+
 ## 0.2.1
 
 - Adds a custom macOS app icon for Finder and the Dock, included in the downloadable app.

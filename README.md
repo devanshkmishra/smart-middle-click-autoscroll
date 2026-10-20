@@ -19,7 +19,9 @@ Requires **macOS 13 or later**. The universal app includes Apple Silicon and Int
 
 The current release is ad-hoc signed and **not notarized**. macOS may block the first launch. If you trust the download, follow [Apple's instructions for opening an unverified app](https://support.apple.com/102445), or build from source. Release downloads include a SHA-256 checksum.
 
-Closing Settings keeps the app running. Quit from Options or the menu bar to stop it. **Show in Dock** is enabled by default; clicking its Dock icon reopens Settings. Startup is opt-in and uses macOS Login Items.
+Closing Settings keeps the app running in the background. Quit from Options or the menu bar to stop it. **Show in Dock** and **Show in Menu Bar** are independent settings, enabled by default.
+
+You can hide both icons. To get back to Settings, open **Smart Middle Click Autoscroll** from Spotlight or Finder. Reopening it preserves your visibility choices. A manual launch opens Settings; startup at login stays in the background when Accessibility is available. Startup is opt-in and uses macOS Login Items.
 
 ## Behavior
 

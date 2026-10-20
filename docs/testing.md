@@ -13,5 +13,6 @@ Open `TestPage.html` locally in your browser with the app enabled and Accessibil
 
 9. Toggle Start at login on, quit and reopen the app, and confirm the switch still reflects macOS registration. Toggle it off to unregister. An actual sign-out/sign-in is a separate manual check.
 10. Toggle Show in Dock off and on. Reopen Settings from the Dock, then open Options and confirm speed, exclusions, and Quit remain reachable without the status icon.
+11. Check all four combinations of Show in Dock and Show in Menu Bar. With both off, close Settings and open the app again from Finder or Spotlight. Settings must appear with both switches still off. Repeat after quitting and relaunching. Restore your preferred visibility settings afterward.
 
 The input engine was physically verified in Arc on Apple Silicon before the public UI cleanup. The public build's automated checks and universal compilation do not establish compatibility with every app or Intel hardware.

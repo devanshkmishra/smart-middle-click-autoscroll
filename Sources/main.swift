@@ -12,6 +12,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var permissionButton: NSButton?
     private var loginButton: NSButton?
     private var dockButton: NSButton?
+    private var menuBarButton: NSButton?
+    private var visibilityHint: NSTextField?
     private var loginStatus: NSTextField?
     private var loginSettingsButton: NSButton?
     private var setupActivity: NSTextField?
@@ -51,6 +53,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         mainMenu.addItem(appMenuItem)
         NSApp.mainMenu = mainMenu
         defaults.register(defaults: ["enabled": true, "speed": 1.0, "horizontal": true, "showDockIcon": true,
+                                     "showMenuBarIcon": true,
                                      "excludedApps": Array(defaultExclusions)])
         NSApp.setActivationPolicy(defaults.bool(forKey: "showDockIcon") ? .regular : .accessory)
         controller.enabled = defaults.bool(forKey: "enabled")
@@ -59,10 +62,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         controller.excludedApps = Set(defaults.stringArray(forKey: "excludedApps") ?? [])
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         statusItem.autosaveName = "SmartMiddleClickAutoscroll"
-        statusItem.isVisible = true
+        statusItem.isVisible = defaults.bool(forKey: "showMenuBarIcon")
         statusItem.menu = NSMenu()
         statusItem.menu?.delegate = self
         statusItem.button?.setAccessibilityLabel(AppInfo.name)
+        DistributedNotificationCenter.default().addObserver(self, selector: #selector(receiveSettingsRequest(_:)),
+            name: AppInfo.showSettingsNotification, object: nil)
         controller.onChange = { [weak self] in self?.refreshStatus() }
         let workspaceCenter = NSWorkspace.shared.notificationCenter
         for name in [NSWorkspace.didActivateApplicationNotification, NSWorkspace.willSleepNotification,
@@ -84,16 +89,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             }
         }
         refreshStatus()
-        if !AXIsProcessTrusted() || !defaults.bool(forKey: "didShowSetup") || CommandLine.arguments.contains("--show") {
+        let launchEvent = NSAppleEventManager.shared().currentAppleEvent
+        let launchedAtLogin = launchEvent?.eventID == kAEOpenApplication &&
+            launchEvent?.paramDescriptor(forKeyword: keyAEPropData)?.enumCodeValue == keyAELaunchedAsLogInItem
+        if !launchedAtLogin || !AXIsProcessTrusted() || CommandLine.arguments.contains("--show") {
             showSetup()
-            defaults.set(true, forKey: "didShowSetup")
         }
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
-        showMenuBarIcon()
         showSetup()
-        return true
+        return false
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
@@ -104,6 +110,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         controller.shutdown()
         permissionTimer?.invalidate()
         for observer in observers { NSWorkspace.shared.notificationCenter.removeObserver(observer) }
+        DistributedNotificationCenter.default().removeObserver(self)
     }
 
     func menuNeedsUpdate(_ menu: NSMenu) {
@@ -142,6 +149,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         login.state = loginRequested ? .on : .off
         let dock = item("Show in Dock", #selector(toggleDock))
         dock.state = defaults.bool(forKey: "showDockIcon") ? .on : .off
+        let menuBar = item("Show in Menu Bar", #selector(toggleMenuBar))
+        menuBar.state = defaults.bool(forKey: "showMenuBarIcon") ? .on : .off
         let exclusionItem = item("Apps keeping native middle click")
         let exclusions = NSMenu()
         for id in controller.excludedApps.sorted() {
@@ -175,7 +184,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         statusItem?.button?.imageScaling = .scaleProportionallyDown
         statusItem?.button?.title = statusItem?.button?.image == nil ? "↕" : ""
         statusItem?.button?.toolTip = "\(AppInfo.name) — \(controller.enabled ? controller.status : "Paused")"
-        setupStatus?.stringValue = controller.enabled ? controller.status : "Paused — enable from the menu bar"
+        setupStatus?.stringValue = controller.enabled ? controller.status : "Paused — enable in Options"
         setupDecision?.stringValue = "Last click: \(controller.lastDecision)"
         setupActivity?.stringValue = controller.activity
         permissionButton?.title = AXIsProcessTrusted() ? "Accessibility Settings…" : "Allow Accessibility…"
@@ -219,11 +228,37 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let visible = !defaults.bool(forKey: "showDockIcon")
         defaults.set(visible, forKey: "showDockIcon")
         NSApp.setActivationPolicy(visible ? .regular : .accessory)
-        dockButton?.state = visible ? .on : .off
+        refreshVisibility()
     }
 
     @objc private func showMenuBarIcon() {
+        defaults.set(true, forKey: "showMenuBarIcon")
         statusItem?.isVisible = true
+        refreshVisibility()
+    }
+
+    @objc private func toggleMenuBar() {
+        let visible = !defaults.bool(forKey: "showMenuBarIcon")
+        defaults.set(visible, forKey: "showMenuBarIcon")
+        statusItem?.isVisible = visible
+        refreshVisibility()
+    }
+
+    private func refreshVisibility() {
+        let dock = defaults.bool(forKey: "showDockIcon")
+        let menuBar = defaults.bool(forKey: "showMenuBarIcon")
+        dockButton?.state = dock ? .on : .off
+        menuBarButton?.state = menuBar ? .on : .off
+        visibilityHint?.isHidden = dock || menuBar
+        if let window = setupWindow, let stack = window.contentView?.subviews.first as? NSStackView {
+            window.contentView?.layoutSubtreeIfNeeded()
+            window.setContentSize(NSSize(width: window.frame.width, height: stack.fittingSize.height + 56))
+        }
+    }
+
+    @objc private func receiveSettingsRequest(_ notification: Notification) {
+        guard notification.object as? String == String(ProcessInfo.processInfo.processIdentifier) else { return }
+        showSetup()
     }
 
     @objc private func showOptions(_ sender: NSButton) {
@@ -288,6 +323,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     @objc private func showSetup() {
         if let setupWindow {
             NSApp.activate(ignoringOtherApps: true)
+            if setupWindow.isMiniaturized { setupWindow.deminiaturize(nil) }
             setupWindow.makeKeyAndOrderFront(nil)
             return
         }
@@ -308,6 +344,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         dock.state = defaults.bool(forKey: "showDockIcon") ? .on : .off
         dockButton = dock
         stack.addArrangedSubview(dock)
+        let menuBar = NSButton(checkboxWithTitle: "Show in Menu Bar", target: self, action: #selector(toggleMenuBar))
+        menuBarButton = menuBar
+        stack.addArrangedSubview(menuBar)
+        visibilityHint = addLabel("Both icons are hidden. Open Smart Middle Click Autoscroll from Spotlight or Finder to return to Settings.", to: stack)
         let row = NSStackView()
         row.spacing = 12
         let permission = NSButton(title: AXIsProcessTrusted() ? "Accessibility Settings…" : "Allow Accessibility…",
@@ -324,6 +364,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         stack.addArrangedSubview(row)
         _ = addLabel("Speed and app exclusions: use Options or the ↕ menu-bar icon.", to: stack)
         setupWindow = window
+        refreshVisibility()
         refreshLoginStatus()
         refreshStatus()
         present(window, stack: stack)
@@ -388,6 +429,8 @@ if let id = Bundle.main.bundleIdentifier,
    let existing = NSRunningApplication.runningApplications(withBundleIdentifier: id)
     .first(where: { $0.processIdentifier != ProcessInfo.processInfo.processIdentifier }) {
     existing.activate(options: [])
+    DistributedNotificationCenter.default().postNotificationName(AppInfo.showSettingsNotification,
+        object: String(existing.processIdentifier), userInfo: nil, deliverImmediately: true)
     exit(0)
 }
 app.setActivationPolicy(.accessory)
