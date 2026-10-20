@@ -11,4 +11,7 @@ Open `TestPage.html` locally in your browser with the app enabled and Accessibil
 7. Test a native app with scrollable content, such as Preview. Note any native-click fallback reported by Diagnostics.
 8. With your mouse remapper running, verify your existing side-button and button-combination gestures while autoscroll is inactive. The first click during active autoscroll is reserved for stopping it.
 
+9. Toggle Start at login on, quit and reopen the app, and confirm the switch still reflects macOS registration. Toggle it off to unregister. An actual sign-out/sign-in is a separate manual check.
+10. Toggle Show in Dock off and on. Reopen Settings from the Dock, then open Options and confirm speed, exclusions, and Quit remain reachable without the status icon.
+
 The input engine was physically verified in Arc on Apple Silicon before the public UI cleanup. The public build's automated checks and universal compilation do not establish compatibility with every app or Intel hardware.

@@ -9,4 +9,6 @@ First public release as **Smart Middle Click Autoscroll**.
 - Free pointer movement while scrolling stays directed at the original content location.
 - Speed control, horizontal scrolling, and per-app exclusions in the menu bar.
 - Compact setup screen, separate diagnostics, and built-in help.
+- Optional Start at login through macOS Login Items.
+- Dock access and an Options button for crowded menu bars.
 - Universal Apple Silicon and Intel app, source, automated checks, and a local test page.

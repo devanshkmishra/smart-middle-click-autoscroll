@@ -11,7 +11,7 @@ mkdir -p "$build_dir/module-cache" "$bundle/Contents/MacOS" "$bundle/Contents/Re
 for arch in arm64 x86_64; do
   xcrun swiftc -swift-version 5 -O -target "$arch-apple-macosx13.0" \
     -module-cache-path "$build_dir/module-cache" \
-    -framework AppKit -framework ApplicationServices \
+    -framework AppKit -framework ApplicationServices -framework ServiceManagement \
     "$project_dir"/Sources/*.swift -o "$build_dir/$executable-$arch"
 done
 xcrun lipo -create "$build_dir/$executable-arm64" "$build_dir/$executable-x86_64" -output "$build_dir/$executable"
